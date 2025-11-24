@@ -73,7 +73,7 @@ vercel login
 ### Step 3: Deploy from Project Root
 
 ```bash
-cd d:\Konten.in\Konten.in\calhacks25\frontend
+cd d:\Konten.in\Konten.in\konten-in-mpt\frontend
 vercel
 ```
 
@@ -196,7 +196,7 @@ sudo chown $USER:$USER /var/www/remixify
 cd /var/www/remixify
 
 # Clone repository
-git clone https://github.com/your-username/calhacks25.git .
+git clone https://github.com/Faternauts/Konten.in-MPT.git .
 
 # Install dependencies
 cd frontend

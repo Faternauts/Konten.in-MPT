@@ -44,7 +44,7 @@ Before you begin, ensure you have the following installed and set up:
 ### 1. Clone or Download the Repository
 
 ```bash
-cd d:\Konten.in\Konten.in\calhacks25
+cd d:\Konten.in\Konten.in\konten-in-mpt
 ```
 
 ### 2. Verify Project Structure
@@ -52,7 +52,7 @@ cd d:\Konten.in\Konten.in\calhacks25
 Ensure you have the following key directories:
 
 ```
-calhacks25/
+konten-in-mpt/
 ├── frontend/
 │   ├── app/
 │   │   ├── api/

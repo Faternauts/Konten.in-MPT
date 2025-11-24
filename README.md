@@ -1,5 +1,5 @@
 
-## Konten.in - Ad Remix Platform - CalHacks 2025
+## Konten.in - Ad Remix Platform - Final Project MPT (D)
 
 Welcome to Konten.in, an exciting social platform for brands to upload ads and let users create remixes through prompt-based AI editing. Includes image editing via Gemini, video generation via Veo 3, user comment/prompt analysis via Claude, deep research, memory, and analytics about the company via Letta, and storage/database via Supabase.
 
