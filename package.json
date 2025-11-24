@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@letta-ai/letta-client": "^0.0.68665",
+    "@supabase/supabase-js": "^2.76.1",
+    "dotenv": "^17.2.3",
+    "exa-js": "^1.10.2",
+    "openai": "^6.7.0"
+  }
+}
