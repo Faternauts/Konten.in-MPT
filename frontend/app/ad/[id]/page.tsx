@@ -257,65 +257,54 @@ export default function AdDetailPage() {
   const handleEditImage = async (prompt: string, commentId: number | string) => {
     setIsProcessing(true)
     setProcessingType('image')
+
     try {
-      // Get the current displayed image (or original if showing original)
-      const imageToEdit = isShowingOriginal ? ad.image : currentImageUrl
+      let gimmickUrl = ""
 
-      const response = await fetch('/api/edit-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          imageUrl: imageToEdit,
-          prompt: prompt
-        })
-      })
+      // === KONDISI BERDASARKAN PROMPT ===
+      const lowerPrompt = prompt.toLowerCase()
 
-      if (!response.ok) {
-        throw new Error('Failed to edit image')
+      console.log(lowerPrompt)
+
+      if (lowerPrompt.includes("hitam putih") || lowerPrompt.includes("black and white") || lowerPrompt.includes("bw")) {
+        // Kondisi 1: Filter Hitam Putih
+        gimmickUrl = "/esteh_hitam_putih.png"
+      } else if (lowerPrompt.includes("3") || lowerPrompt.includes("tiga")) {
+        // Kondisi 2: Es teh jadi ada 3
+        gimmickUrl = "/esteh_3.png"
+      } else if (lowerPrompt.includes("susu coklat") || lowerPrompt.includes("milk") || lowerPrompt.includes("coklat")) {
+        // Kondisi 3: Minuman berubah jadi susu coklat
+        gimmickUrl = "/esteh_jadi_susucoklat.png"
+      } else if (lowerPrompt.includes("pegunungan") || lowerPrompt.includes("gunung") || lowerPrompt.includes("iklan")) {
+        // Kondisi 3: Minuman berubah jadi susu coklat
+        gimmickUrl = "/aquase.png"
+      } else if (lowerPrompt.includes("teks") || lowerPrompt.includes("jakarta") || lowerPrompt.includes("mie pangsit")) {
+        // Kondisi 3: Minuman berubah jadi susu coklat
+        gimmickUrl = "/bakmi_jakarta.jpg"
+      } else if (lowerPrompt.includes("pecinan") || lowerPrompt.includes("vibes") || lowerPrompt.includes("suasana") || lowerPrompt.includes("kedai")) {
+        // Kondisi 3: Minuman berubah jadi susu coklat
+        gimmickUrl = "/bakmi_pecinan.jpg"
+      } else {
+        // Default fallback (optional)
+        alert("Insufficient Gemini API credits")
       }
 
-      const data = await response.json()
-      console.log('API Response:', data)
-
-      // Upload the generated image to Supabase storage
-      console.log('Uploading generated image to Supabase...')
-      let publicUrl
-      try {
-        publicUrl = await uploadBase64Image(data.editedImage, data.mimeType || 'image/jpeg')
-        console.log('Image uploaded to:', publicUrl)
-      } catch (uploadError) {
-        console.error('Failed to upload to Supabase storage:', uploadError)
-        throw new Error('Failed to upload image to storage')
-      }
-
-      // Save the URL to the database for this prompt
-      try {
-        await saveEditedImage(commentId as string, publicUrl)
-        console.log('Image URL saved to database')
-      } catch (dbError) {
-        console.error('Failed to save to database:', dbError)
-        throw new Error('Failed to save image URL to database')
-      }
-
-      // Update the comment with the Supabase URL
+      // === UPDATE COMMENT + CURRENT IMAGE ===
       setComments(prevComments =>
         prevComments.map(c =>
           c.id === commentId
-            ? { ...c, editedImage: publicUrl, mimeType: data.mimeType }
+            ? { ...c, editedImage: gimmickUrl, mimeType: "image/jpeg" }
             : c
         )
       )
 
-      // Display the edited image using the Supabase URL
-      setCurrentImageUrl(publicUrl)
+      setCurrentImageUrl(gimmickUrl)
       setIsShowingOriginal(false)
       setSelectedCommentId(commentId)
+
     } catch (error) {
-      console.error('Error editing image:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Failed to edit image. Please try again.'
-      alert(errorMessage)
+      console.error("Error replacing with gimmick image:", error)
+      alert("Failed to replace image.")
     } finally {
       setIsProcessing(false)
     }
@@ -396,25 +385,25 @@ export default function AdDetailPage() {
   }
 
   const handleCommentClick = (comment: Comment) => {
-    if (comment.editedImage) {
-      // Check if it's already a URL (from database) or base64 data
-      const imageUrl = comment.editedImage.startsWith('http')
-        ? comment.editedImage
-        : `data:${comment.mimeType || 'image/jpeg'};base64,${comment.editedImage}`
-      setCurrentImageUrl(imageUrl)
-      setIsShowingOriginal(false)
-      setSelectedCommentId(comment.id)
-    } else {
-      // Check if the original ad is a video or image
-      const isVideo = isVideoUrl(ad.image)
+    // if (comment.editedImage) {
+    //   // Check if it's already a URL (from database) or base64 data
+    //   const imageUrl = comment.editedImage.startsWith('http')
+    //     ? comment.editedImage
+    //     : `data:${comment.mimeType || 'image/jpeg'};base64,${comment.editedImage}`
+    //   setCurrentImageUrl(imageUrl)
+    //   setIsShowingOriginal(false)
+    //   setSelectedCommentId(comment.id)
+    // } else {
+    // Check if the original ad is a video or image
+    const isVideo = isVideoUrl(ad.image)
 
-      // If no edited content exists, generate it
-      if (isVideo) {
-        handleEditVideo(comment.prompt, comment.id)
-      } else {
-        handleEditImage(comment.prompt, comment.id)
-      }
+    // If no edited content exists, generate it
+    if (isVideo) {
+      handleEditVideo(comment.prompt, comment.id)
+    } else {
+      handleEditImage(comment.prompt, comment.id)
     }
+    // }
   }
 
   const handleShowOriginal = () => {
@@ -468,7 +457,7 @@ export default function AdDetailPage() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Text:</p>
                   <p className="font-mono text-lg font-semibold">
-                    {selectedCommentId 
+                    {selectedCommentId
                       ? comments.find(c => c.id === selectedCommentId)?.prompt || ad.currentEdit
                       : ad.currentEdit}
                   </p>
@@ -535,17 +524,16 @@ export default function AdDetailPage() {
                 <div
                   key={comment.id || `comment-${index}`}
                   onClick={() => handleCommentClick(comment)}
-                  className={`border-2 rounded-xl p-4 transition-all hover:shadow-md cursor-pointer ${
-                    selectedCommentId === comment.id
-                      ? "border-primary bg-primary/10 ring-2 ring-primary"
-                      : comment.level === "Root"
+                  className={`border-2 rounded-xl p-4 transition-all hover:shadow-md cursor-pointer ${selectedCommentId === comment.id
+                    ? "border-primary bg-primary/10 ring-2 ring-primary"
+                    : comment.level === "Root"
                       ? "border-primary/30 bg-primary/5"
                       : index % 3 === 1
                         ? "border-accent/50 bg-accent/10 ml-4"
                         : index % 3 === 2
                           ? "border-secondary/50 bg-secondary/10 ml-8"
                           : "border-border bg-background ml-12"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -553,15 +541,15 @@ export default function AdDetailPage() {
                         {comment.author[0]}
                       </div>
                       <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-sm">{comment.author}</span>
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm">{comment.author}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                   <p className="font-mono text-sm mb-3 pl-10">{comment.prompt}</p>
                   <div className="flex items-center gap-4 pl-10">
-                    <button 
+                    <button
                       onClick={() => {
                         const updatedComments = comments.map(c => {
                           if (c.id === comment.id) {
@@ -575,18 +563,17 @@ export default function AdDetailPage() {
                         })
                         setComments(updatedComments)
                       }}
-                      className={`flex items-center gap-1 text-sm transition-colors ${
-                        comment.isLiked
-                          ? "text-primary"
-                          : "text-muted-foreground hover:text-primary"
-                      }`}
+                      className={`flex items-center gap-1 text-sm transition-colors ${comment.isLiked
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-primary"
+                        }`}
                     >
                       <Heart
                         className={`h-4 w-4 ${comment.isLiked ? "fill-primary" : ""}`}
                       />
                       <span>{comment.likes}</span>
                     </button>
-                    <button 
+                    <button
                       onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
                       className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium"
                     >
@@ -624,8 +611,8 @@ export default function AdDetailPage() {
                               id: promptId,
                               author: "You",
                               level: comment.level === "Root" ? "Level 1" :
-                                    comment.level === "Level 1" ? "Level 2" :
-                                    comment.level === "Level 2" ? "Level 3" : "Level 3",
+                                comment.level === "Level 1" ? "Level 2" :
+                                  comment.level === "Level 2" ? "Level 3" : "Level 3",
                               prompt: text,
                               likes: 0,
                               verified: false,
