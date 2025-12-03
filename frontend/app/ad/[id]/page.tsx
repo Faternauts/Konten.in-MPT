@@ -289,6 +289,9 @@ export default function AdDetailPage() {
         alert("Insufficient Gemini API credits")
       }
 
+      // === DELAY 5 DETIK BIAR KAYAK LAGI GENERATE ===
+      await new Promise(resolve => setTimeout(resolve, 5000))
+
       // === UPDATE COMMENT + CURRENT IMAGE ===
       setComments(prevComments =>
         prevComments.map(c =>
