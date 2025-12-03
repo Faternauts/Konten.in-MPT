@@ -1,11 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatNumberWithCommas } from "@/lib/format";
 import {
   Settings,
   Trophy,
@@ -22,8 +23,8 @@ import {
   CreditCard,
   Coffee,
   Shirt,
-  Ticket
-} from "lucide-react"
+  Ticket,
+} from "lucide-react";
 
 const userStats = {
   username: "creative_maker",
@@ -36,16 +37,52 @@ const userStats = {
   followers: 892,
   following: 156,
   creditsRemaining: 3,
-}
+};
 
 const badges = [
-  { id: 1, name: "100 Remix Master", icon: Sparkles, color: "gradient-primary", unlocked: true },
-  { id: 2, name: "Viral Creator", icon: TrendingUp, color: "gradient-primary", unlocked: true },
-  { id: 3, name: "Brand Champion", icon: Crown, color: "gradient-primary", unlocked: false },
-  { id: 4, name: "Top 10 Creator", icon: Trophy, color: "gradient-primary", unlocked: true },
-  { id: 5, name: "Lightning Fast", icon: Zap, color: "gradient-primary", unlocked: false },
-  { id: 6, name: "Challenge Winner", icon: Target, color: "gradient-primary", unlocked: true },
-]
+  {
+    id: 1,
+    name: "100 Remix Master",
+    icon: Sparkles,
+    color: "gradient-primary",
+    unlocked: true,
+  },
+  {
+    id: 2,
+    name: "Viral Creator",
+    icon: TrendingUp,
+    color: "gradient-primary",
+    unlocked: true,
+  },
+  {
+    id: 3,
+    name: "Brand Champion",
+    icon: Crown,
+    color: "gradient-primary",
+    unlocked: false,
+  },
+  {
+    id: 4,
+    name: "Top 10 Creator",
+    icon: Trophy,
+    color: "gradient-primary",
+    unlocked: true,
+  },
+  {
+    id: 5,
+    name: "Lightning Fast",
+    icon: Zap,
+    color: "gradient-primary",
+    unlocked: false,
+  },
+  {
+    id: 6,
+    name: "Challenge Winner",
+    icon: Target,
+    color: "gradient-primary",
+    unlocked: true,
+  },
+];
 
 const myRemixes = [
   {
@@ -102,10 +139,9 @@ const myRemixes = [
     views: 11234,
     createdAt: "2 weeks ago",
   },
-]
+];
 
 const savedRemixes = [
-  
   {
     id: 8,
     brand: "Amazon",
@@ -126,7 +162,7 @@ const savedRemixes = [
     views: 23456,
     savedAt: "5 days ago",
   },
-]
+];
 
 const rewards = [
   {
@@ -195,10 +231,10 @@ const rewards = [
     description: "VIP access to Coca-Cola creator summit",
     unlocked: true,
   },
-]
+];
 
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState("saved")
+  const [activeTab, setActiveTab] = useState("saved");
 
   return (
     <div className="min-h-screen pb-12">
@@ -209,18 +245,24 @@ export default function ProfilePage() {
             {/* Avatar */}
             <Avatar className="h-32 w-32 ring-4 ring-primary/30 dark:ring-primary shadow-xl">
               <AvatarImage src="" />
-              <AvatarFallback className="text-4xl font-bold bg-primary text-white">AR</AvatarFallback>
+              <AvatarFallback className="text-4xl font-bold bg-primary text-white">
+                AR
+              </AvatarFallback>
             </Avatar>
 
             {/* User Info */}
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row md:items-center gap-3 mb-3">
-                <h1 className="text-3xl md:text-4xl font-bold text-foreground">{userStats.displayName}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+                  {userStats.displayName}
+                </h1>
                 <Badge className="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary border-0 w-fit mx-auto md:mx-0">
                   @{userStats.username}
                 </Badge>
               </div>
-              <p className="text-lg text-muted-foreground mb-4 max-w-2xl">{userStats.bio}</p>
+              <p className="text-lg text-muted-foreground mb-4 max-w-2xl">
+                {userStats.bio}
+              </p>
               <div className="flex items-center gap-4 text-muted-foreground text-sm justify-center md:justify-start">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
@@ -228,14 +270,17 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <Trophy className="h-4 w-4" />
-                  {userStats.points.toLocaleString()} points
+                  {formatNumberWithCommas(userStats.points)} points
                 </div>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="flex gap-2">
-              <Button variant="outline" className="bg-transparent border-primary/30 hover:bg-primary/5">
+              <Button
+                variant="outline"
+                className="bg-transparent border-primary/30 hover:bg-primary/5"
+              >
                 <Settings className="h-4 w-4 mr-2" />
                 Edit Profile
               </Button>
@@ -249,32 +294,42 @@ export default function ProfilePage() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           <Card className="hover:shadow-lg transition-all">
             <CardContent className="p-4 text-center">
-              <div className="text-3xl font-bold text-foreground mb-1">{userStats.remixCount}</div>
+              <div className="text-3xl font-bold text-foreground mb-1">
+                {userStats.remixCount}
+              </div>
               <div className="text-sm text-muted-foreground">Remixes</div>
             </CardContent>
           </Card>
           <Card className="hover:shadow-lg transition-all">
             <CardContent className="p-4 text-center">
-              <div className="text-3xl font-bold text-foreground mb-1">{userStats.likesReceived.toLocaleString()}</div>
+              <div className="text-3xl font-bold text-foreground mb-1">
+                {formatNumberWithCommas(userStats.likesReceived)}
+              </div>
               <div className="text-sm text-muted-foreground">Likes</div>
             </CardContent>
           </Card>
           <Card className="hover:shadow-lg transition-all">
             <CardContent className="p-4 text-center">
-              <div className="text-3xl font-bold text-foreground mb-1">{userStats.followers}</div>
+              <div className="text-3xl font-bold text-foreground mb-1">
+                {userStats.followers}
+              </div>
               <div className="text-sm text-muted-foreground">Followers</div>
             </CardContent>
           </Card>
           <Card className="hover:shadow-lg transition-all">
             <CardContent className="p-4 text-center">
-              <div className="text-3xl font-bold text-foreground mb-1">{userStats.following}</div>
+              <div className="text-3xl font-bold text-foreground mb-1">
+                {userStats.following}
+              </div>
               <div className="text-sm text-muted-foreground">Following</div>
             </CardContent>
           </Card>
           <Card className="hover:shadow-lg transition-all">
             <CardContent className="p-4 text-center">
-              <div className="text-3xl font-bold text-foreground mb-1">{userStats.creditsRemaining}</div>
-              <div className="text-sm text-muted-foreground">Credits</div>
+              <div className="text-3xl font-bold text-foreground mb-1">
+                {formatNumberWithCommas(userStats.likesReceived)}
+              </div>
+              <div className="text-sm text-muted-foreground">Likes</div>
             </CardContent>
           </Card>
         </div>
@@ -288,7 +343,7 @@ export default function ProfilePage() {
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {badges.map((badge) => {
-                const Icon = badge.icon
+                const Icon = badge.icon;
                 return (
                   <div
                     key={badge.id}
@@ -298,8 +353,16 @@ export default function ProfilePage() {
                         : "bg-secondary/50 opacity-50 grayscale"
                     }`}
                   >
-                    <Icon className={`h-8 w-8 mx-auto mb-2 ${badge.unlocked ? "text-white" : "text-muted-foreground"}`} />
-                    <p className={`text-xs font-semibold ${badge.unlocked ? "text-white" : "text-muted-foreground"}`}>
+                    <Icon
+                      className={`h-8 w-8 mx-auto mb-2 ${
+                        badge.unlocked ? "text-white" : "text-muted-foreground"
+                      }`}
+                    />
+                    <p
+                      className={`text-xs font-semibold ${
+                        badge.unlocked ? "text-white" : "text-muted-foreground"
+                      }`}
+                    >
                       {badge.name}
                     </p>
                     {!badge.unlocked && (
@@ -310,7 +373,7 @@ export default function ProfilePage() {
                       </div>
                     )}
                   </div>
-                )
+                );
               })}
             </div>
           </CardContent>
@@ -325,13 +388,15 @@ export default function ProfilePage() {
                 Brand Rewards
               </h2>
               <p className="text-sm text-muted-foreground">
-                Earn exclusive rewards from brands by reaching milestones on their ads
+                Earn exclusive rewards from brands by reaching milestones on
+                their ads
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {rewards.map((reward) => {
-                const Icon = reward.icon
-                const progressPercentage = (reward.progress / reward.goal) * 100
+                const Icon = reward.icon;
+                const progressPercentage =
+                  (reward.progress / reward.goal) * 100;
                 return (
                   <Card
                     key={reward.id}
@@ -344,15 +409,23 @@ export default function ProfilePage() {
                     <CardContent className="p-4">
                       {/* Header with icon and company */}
                       <div className="flex items-start gap-3 mb-3">
-                        <div className={`p-3 rounded-lg ${reward.unlocked ? "bg-primary" : "bg-primary/70"}`}>
+                        <div
+                          className={`p-3 rounded-lg ${
+                            reward.unlocked ? "bg-primary" : "bg-primary/70"
+                          }`}
+                        >
                           <Icon className="h-6 w-6 text-white" />
                         </div>
                         <div className="flex-1">
                           <Badge variant="secondary" className="mb-2 text-xs">
                             {reward.company}
                           </Badge>
-                          <h3 className="font-semibold text-sm mb-1">{reward.name}</h3>
-                          <p className="text-xs text-muted-foreground line-clamp-2">{reward.description}</p>
+                          <h3 className="font-semibold text-sm mb-1">
+                            {reward.name}
+                          </h3>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            {reward.description}
+                          </p>
                         </div>
                       </div>
 
@@ -360,19 +433,26 @@ export default function ProfilePage() {
                       <div className="space-y-2 mb-3">
                         <div className="flex items-start gap-2">
                           <Target className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                          <p className="text-xs text-muted-foreground">{reward.milestone}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {reward.milestone}
+                          </p>
                         </div>
                         <div className="space-y-1">
                           <div className="flex justify-between text-xs">
-                            <span className="text-muted-foreground">Progress</span>
+                            <span className="text-muted-foreground">
+                              Progress
+                            </span>
                             <span className="font-semibold">
-                              {reward.progress.toLocaleString()} / {reward.goal.toLocaleString()}
+                              {formatNumberWithCommas(reward.progress)} /{" "}
+                              {formatNumberWithCommas(reward.goal)}
                             </span>
                           </div>
                           <div className="w-full bg-secondary rounded-full h-2">
                             <div
                               className="h-2 rounded-full transition-all bg-primary"
-                              style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                              style={{
+                                width: `${Math.min(progressPercentage, 100)}%`,
+                              }}
                             />
                           </div>
                         </div>
@@ -381,7 +461,11 @@ export default function ProfilePage() {
                       {/* Action button */}
                       <Button
                         size="sm"
-                        className={`w-full ${reward.unlocked ? "bg-primary text-white hover:bg-primary/90" : ""}`}
+                        className={`w-full ${
+                          reward.unlocked
+                            ? "bg-primary text-white hover:bg-primary/90"
+                            : ""
+                        }`}
                         disabled={!reward.unlocked}
                         variant={reward.unlocked ? "default" : "outline"}
                       >
@@ -396,7 +480,7 @@ export default function ProfilePage() {
                       </Button>
                     </CardContent>
                   </Card>
-                )
+                );
               })}
             </div>
           </CardContent>
@@ -438,7 +522,10 @@ export default function ProfilePage() {
           <TabsContent value="saved" className="space-y-6">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {savedRemixes.map((remix) => (
-                <Card key={remix.id} className="overflow-hidden hover:shadow-xl transition-all group">
+                <Card
+                  key={remix.id}
+                  className="overflow-hidden hover:shadow-xl transition-all group"
+                >
                   <div className="relative overflow-hidden">
                     <img
                       src={remix.image || "/placeholder.svg"}
@@ -456,26 +543,34 @@ export default function ProfilePage() {
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="absolute bottom-3 left-3 right-3">
-                        <p className="text-white text-sm font-medium line-clamp-2 drop-shadow-lg">{remix.prompt}</p>
+                        <p className="text-white text-sm font-medium line-clamp-2 drop-shadow-lg">
+                          {remix.prompt}
+                        </p>
                       </div>
                     </div>
                   </div>
                   <CardContent className="p-4 bg-background/80 backdrop-blur-sm">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <span className="font-semibold block">{remix.brand}</span>
-                        <span className="text-xs text-muted-foreground">by {remix.creator}</span>
+                        <span className="font-semibold block">
+                          {remix.brand}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          by {remix.creator}
+                        </span>
                       </div>
-                      <span className="text-xs text-muted-foreground">{remix.savedAt}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {remix.createdAt}
+                      </span>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Heart className="h-4 w-4" />
-                        {remix.likes.toLocaleString()}
+                        {formatNumberWithCommas(remix.likes)}
                       </span>
                       <span className="flex items-center gap-1">
                         <TrendingUp className="h-4 w-4" />
-                        {remix.views.toLocaleString()}
+                        {formatNumberWithCommas(remix.views)}
                       </span>
                     </div>
                   </CardContent>
@@ -487,7 +582,10 @@ export default function ProfilePage() {
           <TabsContent value="remixes" className="space-y-6">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {myRemixes.map((remix) => (
-                <Card key={remix.id} className="overflow-hidden hover:shadow-xl transition-all group">
+                <Card
+                  key={remix.id}
+                  className="overflow-hidden hover:shadow-xl transition-all group"
+                >
                   <div className="relative overflow-hidden">
                     <img
                       src={remix.image || "/placeholder.svg"}
@@ -496,23 +594,27 @@ export default function ProfilePage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="absolute bottom-3 left-3 right-3">
-                        <p className="text-white text-sm font-medium line-clamp-2 drop-shadow-lg">{remix.prompt}</p>
+                        <p className="text-white text-sm font-medium line-clamp-2 drop-shadow-lg">
+                          {remix.prompt}
+                        </p>
                       </div>
                     </div>
                   </div>
                   <CardContent className="p-4 bg-background/80 backdrop-blur-sm">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-semibold">{remix.brand}</span>
-                      <span className="text-xs text-muted-foreground">{remix.createdAt}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {remix.createdAt}
+                      </span>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Heart className="h-4 w-4" />
-                        {remix.likes.toLocaleString()}
+                        {formatNumberWithCommas(remix.likes)}
                       </span>
                       <span className="flex items-center gap-1">
                         <TrendingUp className="h-4 w-4" />
-                        {remix.views.toLocaleString()}
+                        {formatNumberWithCommas(remix.views)}
                       </span>
                     </div>
                   </CardContent>
@@ -524,16 +626,24 @@ export default function ProfilePage() {
           <TabsContent value="liked" className="space-y-6">
             <div className="text-center py-12">
               <Heart className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <h3 className="text-xl font-semibold mb-2">No liked remixes yet</h3>
-              <p className="text-muted-foreground">Start exploring and like remixes that inspire you!</p>
+              <h3 className="text-xl font-semibold mb-2">
+                No liked remixes yet
+              </h3>
+              <p className="text-muted-foreground">
+                Start exploring and like remixes that inspire you!
+              </p>
             </div>
           </TabsContent>
 
           <TabsContent value="challenges" className="space-y-6">
             <div className="text-center py-12">
               <Trophy className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <h3 className="text-xl font-semibold mb-2">No active challenges</h3>
-              <p className="text-muted-foreground mb-4">Join challenges to compete for prizes and prove you're the best!</p>
+              <h3 className="text-xl font-semibold mb-2">
+                No active challenges
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                Join challenges to compete for prizes and prove you're the best!
+              </p>
               <Button className="gradient-primary text-white">
                 Browse Challenges
               </Button>
@@ -542,5 +652,5 @@ export default function ProfilePage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

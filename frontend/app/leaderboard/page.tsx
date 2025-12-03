@@ -1,13 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Trophy, TrendingUp, Flame, Crown, Medal, Award, Search, Star, Heart } from "lucide-react"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Trophy,
+  TrendingUp,
+  Flame,
+  Crown,
+  Medal,
+  Award,
+  Search,
+  Star,
+  Heart,
+} from "lucide-react";
+import { formatNumberWithCommas } from "@/lib/format";
 
 const topCreators = [
   {
@@ -98,7 +109,7 @@ const topCreators = [
     wins: 4,
     badge: "Pro",
   },
-]
+];
 
 const featuredCreator = {
   name: "Sarah Chen",
@@ -113,8 +124,8 @@ const featuredCreator = {
     brand: "Nike",
     image: "/nike-athletic-shoe-advertisement.jpg",
     likes: 8234,
-  }
-}
+  },
+};
 
 const weeklyTrendingRemixes = [
   {
@@ -172,7 +183,7 @@ const weeklyTrendingRemixes = [
     views: 28910,
     growth: "+198%",
   },
-]
+];
 
 const categoryLeaderboards = [
   {
@@ -223,45 +234,50 @@ const categoryLeaderboards = [
     remixCount: 2456,
     avgEngagement: "9.1K",
   },
-]
+];
 
 export default function LeaderboardPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [timeframe, setTimeframe] = useState("all-time")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [timeframe, setTimeframe] = useState("all-time");
 
-  const filteredCategories = categoryLeaderboards.filter(cat =>
-    cat.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    cat.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    cat.topBrand.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredCategories = categoryLeaderboards.filter(
+    (cat) =>
+      cat.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cat.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cat.topBrand.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return <Crown className="h-6 w-6 text-primary" />
+        return <Crown className="h-6 w-6 text-primary" />;
       case 2:
-        return <Medal className="h-6 w-6 text-primary/70" />
+        return <Medal className="h-6 w-6 text-primary/70" />;
       case 3:
-        return <Award className="h-6 w-6 text-primary/70" />
+        return <Award className="h-6 w-6 text-primary/70" />;
       default:
-        return <span className="text-2xl font-bold text-muted-foreground">{rank}</span>
+        return (
+          <span className="text-2xl font-bold text-muted-foreground">
+            {rank}
+          </span>
+        );
     }
-  }
+  };
 
   const getBadgeColor = (badge: string) => {
     switch (badge) {
       case "Legend":
-        return "bg-primary text-white"
+        return "bg-primary text-white";
       case "Master":
-        return "bg-primary/90 text-white"
+        return "bg-primary/90 text-white";
       case "Expert":
-        return "bg-primary/80 text-white"
+        return "bg-primary/80 text-white";
       case "Pro":
-        return "bg-primary/70 text-white"
+        return "bg-primary/70 text-white";
       default:
-        return "bg-secondary text-foreground"
+        return "bg-secondary text-foreground";
     }
-  }
+  };
 
   return (
     <div className="min-h-screen pb-12">
@@ -295,7 +311,10 @@ export default function LeaderboardPage() {
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
               {weeklyTrendingRemixes.map((remix, index) => (
-                <Card key={remix.id} className="overflow-hidden hover:shadow-xl transition-all group relative">
+                <Card
+                  key={remix.id}
+                  className="overflow-hidden hover:shadow-xl transition-all group relative"
+                >
                   {index === 0 && (
                     <div className="absolute top-2 left-2 z-10">
                       <Badge className="bg-primary text-white">
@@ -319,20 +338,27 @@ export default function LeaderboardPage() {
                   </div>
                   <CardContent className="p-3">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-sm">{remix.brand}</span>
-                      <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                      <span className="font-semibold text-sm">
+                        {remix.brand}
+                      </span>
+                      <Badge
+                        variant="secondary"
+                        className="text-xs bg-primary/10 text-primary"
+                      >
                         {remix.growth}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2">by {remix.username}</p>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      by {remix.username}
+                    </p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Heart className="h-3 w-3" />
-                        {remix.likes.toLocaleString()}
+                        {formatNumberWithCommas(remix.likes)}
                       </span>
                       <span className="flex items-center gap-1">
                         <TrendingUp className="h-3 w-3" />
-                        {remix.views.toLocaleString()}
+                        {formatNumberWithCommas(remix.views)}
                       </span>
                     </div>
                   </CardContent>
@@ -348,8 +374,12 @@ export default function LeaderboardPage() {
           {filteredCategories.length === 0 ? (
             <Card className="p-12 text-center">
               <Search className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <h3 className="text-xl font-semibold mb-2">No categories found</h3>
-              <p className="text-muted-foreground">Try searching for a different category</p>
+              <h3 className="text-xl font-semibold mb-2">
+                No categories found
+              </h3>
+              <p className="text-muted-foreground">
+                Try searching for a different category
+              </p>
             </Card>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -361,26 +391,46 @@ export default function LeaderboardPage() {
                   <CardContent className="p-6">
                     <div>
                       <h3 className="font-bold text-lg mb-1">{cat.category}</h3>
-                      <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{cat.description}</p>
+                      <p className="text-xs text-muted-foreground mb-4 line-clamp-2">
+                        {cat.description}
+                      </p>
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Top Creator</span>
-                          <span className="font-semibold">{cat.topCreator}</span>
+                          <span className="text-muted-foreground">
+                            Top Creator
+                          </span>
+                          <span className="font-semibold">
+                            {cat.topCreator}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Top Brand</span>
+                          <span className="text-muted-foreground">
+                            Top Brand
+                          </span>
                           <span className="font-semibold">{cat.topBrand}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Total Remixes</span>
-                          <span className="font-semibold">{cat.remixCount.toLocaleString()}</span>
+                          <span className="text-muted-foreground">
+                            Total Remixes
+                          </span>
+                          <span className="font-semibold">
+                            {formatNumberWithCommas(cat.remixCount)}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Avg Engagement</span>
-                          <span className="font-semibold">{cat.avgEngagement}</span>
+                          <span className="text-muted-foreground">
+                            Avg Engagement
+                          </span>
+                          <span className="font-semibold">
+                            {cat.avgEngagement}
+                          </span>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm" className="w-full mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-4"
+                      >
                         View Leaderboard
                       </Button>
                     </div>
@@ -396,7 +446,9 @@ export default function LeaderboardPage() {
           <div className="gradient-primary px-6 py-4">
             <div className="flex items-center gap-2 text-white">
               <Star className="h-5 w-5 fill-white" />
-              <h2 className="text-xl font-bold">Featured Creator of the Week</h2>
+              <h2 className="text-xl font-bold">
+                Featured Creator of the Week
+              </h2>
             </div>
           </div>
           <CardContent className="p-6">
@@ -415,19 +467,29 @@ export default function LeaderboardPage() {
                     {featuredCreator.badge}
                   </Badge>
                 </div>
-                <p className="text-muted-foreground mb-3">{featuredCreator.username}</p>
+                <p className="text-muted-foreground mb-3">
+                  {featuredCreator.username}
+                </p>
                 <p className="text-sm mb-4">{featuredCreator.bio}</p>
                 <div className="flex gap-6 text-sm">
                   <div>
-                    <div className="font-bold text-lg gradient-text">{featuredCreator.weeklyRemixes}</div>
-                    <div className="text-muted-foreground">Remixes this week</div>
+                    <div className="font-bold text-lg gradient-text">
+                      {featuredCreator.weeklyRemixes}
+                    </div>
+                    <div className="text-muted-foreground">
+                      Remixes this week
+                    </div>
                   </div>
                   <div>
-                    <div className="font-bold text-lg gradient-text">{featuredCreator.weeklyLikes.toLocaleString()}</div>
+                    <div className="font-bold text-lg gradient-text">
+                      {formatNumberWithCommas(featuredCreator.weeklyLikes)}
+                    </div>
                     <div className="text-muted-foreground">Likes this week</div>
                   </div>
                   <div>
-                    <div className="font-bold text-lg gradient-text">{featuredCreator.totalPoints.toLocaleString()}</div>
+                    <div className="font-bold text-lg gradient-text">
+                      {formatNumberWithCommas(featuredCreator.totalPoints)}
+                    </div>
                     <div className="text-muted-foreground">Total Points</div>
                   </div>
                 </div>
@@ -445,7 +507,7 @@ export default function LeaderboardPage() {
                 <div className="absolute bottom-2 left-2 right-2">
                   <Badge className="bg-background/90 backdrop-blur-sm text-foreground border-0 flex items-center gap-1 w-fit">
                     <Heart className="h-3 w-3 fill-primary text-primary" />
-                    {featuredCreator.topRemix.likes.toLocaleString()}
+                    {formatNumberWithCommas(featuredCreator.topRemix.likes)}
                   </Badge>
                 </div>
               </div>
@@ -459,7 +521,9 @@ export default function LeaderboardPage() {
             <Trophy className="h-6 w-6 text-primary" />
             Overall Leaderboard
           </h2>
-          <p className="text-muted-foreground">Top creators across all brands and categories</p>
+          <p className="text-muted-foreground">
+            Top creators across all brands and categories
+          </p>
         </div>
 
         <Tabs defaultValue="creators" className="w-full">
@@ -481,21 +545,33 @@ export default function LeaderboardPage() {
               <Button
                 variant={timeframe === "all-time" ? "default" : "outline"}
                 onClick={() => setTimeframe("all-time")}
-                className={timeframe === "all-time" ? "gradient-primary text-white" : "bg-transparent"}
+                className={
+                  timeframe === "all-time"
+                    ? "gradient-primary text-white"
+                    : "bg-transparent"
+                }
               >
                 All Time
               </Button>
               <Button
                 variant={timeframe === "monthly" ? "default" : "outline"}
                 onClick={() => setTimeframe("monthly")}
-                className={timeframe === "monthly" ? "gradient-primary text-white" : "bg-transparent"}
+                className={
+                  timeframe === "monthly"
+                    ? "gradient-primary text-white"
+                    : "bg-transparent"
+                }
               >
                 This Month
               </Button>
               <Button
                 variant={timeframe === "weekly" ? "default" : "outline"}
                 onClick={() => setTimeframe("weekly")}
-                className={timeframe === "weekly" ? "gradient-primary text-white" : "bg-transparent"}
+                className={
+                  timeframe === "weekly"
+                    ? "gradient-primary text-white"
+                    : "bg-transparent"
+                }
               >
                 This Week
               </Button>
@@ -506,26 +582,44 @@ export default function LeaderboardPage() {
               {/* 2nd Place */}
               <Card className="md:mt-8 hover:shadow-xl transition-all">
                 <CardContent className="p-6 text-center">
-                  <div className="flex justify-center mb-4">{getRankIcon(2)}</div>
+                  <div className="flex justify-center mb-4">
+                    {getRankIcon(2)}
+                  </div>
                   <Avatar className="h-20 w-20 mx-auto mb-4 ring-4 ring-gray-400">
-                    <AvatarImage src={topCreators[1].avatar || "/placeholder.svg"} />
+                    <AvatarImage
+                      src={topCreators[1].avatar || "/placeholder.svg"}
+                    />
                     <AvatarFallback>MJ</AvatarFallback>
                   </Avatar>
-                  <h3 className="font-bold text-lg mb-1">{topCreators[1].name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{topCreators[1].username}</p>
-                  <Badge className={`${getBadgeColor(topCreators[1].badge)} mb-4`}>{topCreators[1].badge}</Badge>
+                  <h3 className="font-bold text-lg mb-1">
+                    {topCreators[1].name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {topCreators[1].username}
+                  </p>
+                  <Badge
+                    className={`${getBadgeColor(topCreators[1].badge)} mb-4`}
+                  >
+                    {topCreators[1].badge}
+                  </Badge>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Points</span>
-                      <span className="font-semibold">{topCreators[1].points.toLocaleString()}</span>
+                      <span className="font-semibold">
+                        {formatNumberWithCommas(topCreators[1].points)}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Remixes</span>
-                      <span className="font-semibold">{topCreators[1].remixes}</span>
+                      <span className="font-semibold">
+                        {topCreators[1].remixes}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Wins</span>
-                      <span className="font-semibold">{topCreators[1].wins}</span>
+                      <span className="font-semibold">
+                        {topCreators[1].wins}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -534,26 +628,44 @@ export default function LeaderboardPage() {
               {/* 1st Place */}
               <Card className="hover:shadow-xl transition-all border-2 border-yellow-500">
                 <CardContent className="p-6 text-center">
-                  <div className="flex justify-center mb-4">{getRankIcon(1)}</div>
+                  <div className="flex justify-center mb-4">
+                    {getRankIcon(1)}
+                  </div>
                   <Avatar className="h-24 w-24 mx-auto mb-4 ring-4 ring-yellow-500">
-                    <AvatarImage src={topCreators[0].avatar || "/placeholder.svg"} />
+                    <AvatarImage
+                      src={topCreators[0].avatar || "/placeholder.svg"}
+                    />
                     <AvatarFallback>SC</AvatarFallback>
                   </Avatar>
-                  <h3 className="font-bold text-xl mb-1">{topCreators[0].name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{topCreators[0].username}</p>
-                  <Badge className={`${getBadgeColor(topCreators[0].badge)} mb-4`}>{topCreators[0].badge}</Badge>
+                  <h3 className="font-bold text-xl mb-1">
+                    {topCreators[0].name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {topCreators[0].username}
+                  </p>
+                  <Badge
+                    className={`${getBadgeColor(topCreators[0].badge)} mb-4`}
+                  >
+                    {topCreators[0].badge}
+                  </Badge>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Points</span>
-                      <span className="font-semibold">{topCreators[0].points.toLocaleString()}</span>
+                      <span className="font-semibold">
+                        {formatNumberWithCommas(topCreators[0].points)}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Remixes</span>
-                      <span className="font-semibold">{topCreators[0].remixes}</span>
+                      <span className="font-semibold">
+                        {topCreators[0].remixes}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Wins</span>
-                      <span className="font-semibold">{topCreators[0].wins}</span>
+                      <span className="font-semibold">
+                        {topCreators[0].wins}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -562,26 +674,44 @@ export default function LeaderboardPage() {
               {/* 3rd Place */}
               <Card className="md:mt-8 hover:shadow-xl transition-all">
                 <CardContent className="p-6 text-center">
-                  <div className="flex justify-center mb-4">{getRankIcon(3)}</div>
+                  <div className="flex justify-center mb-4">
+                    {getRankIcon(3)}
+                  </div>
                   <Avatar className="h-20 w-20 mx-auto mb-4 ring-4 ring-amber-600">
-                    <AvatarImage src={topCreators[2].avatar || "/placeholder.svg"} />
+                    <AvatarImage
+                      src={topCreators[2].avatar || "/placeholder.svg"}
+                    />
                     <AvatarFallback>ER</AvatarFallback>
                   </Avatar>
-                  <h3 className="font-bold text-lg mb-1">{topCreators[2].name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{topCreators[2].username}</p>
-                  <Badge className={`${getBadgeColor(topCreators[2].badge)} mb-4`}>{topCreators[2].badge}</Badge>
+                  <h3 className="font-bold text-lg mb-1">
+                    {topCreators[2].name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {topCreators[2].username}
+                  </p>
+                  <Badge
+                    className={`${getBadgeColor(topCreators[2].badge)} mb-4`}
+                  >
+                    {topCreators[2].badge}
+                  </Badge>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Points</span>
-                      <span className="font-semibold">{topCreators[2].points.toLocaleString()}</span>
+                      <span className="font-semibold">
+                        {formatNumberWithCommas(topCreators[2].points)}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Remixes</span>
-                      <span className="font-semibold">{topCreators[2].remixes}</span>
+                      <span className="font-semibold">
+                        {topCreators[2].remixes}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Wins</span>
-                      <span className="font-semibold">{topCreators[2].wins}</span>
+                      <span className="font-semibold">
+                        {topCreators[2].wins}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -596,19 +726,35 @@ export default function LeaderboardPage() {
                     key={creator.id}
                     className="flex items-center gap-4 p-4 border-b last:border-b-0 hover:bg-secondary/50 transition-colors"
                   >
-                    <div className="w-12 text-center">{getRankIcon(creator.rank)}</div>
+                    <div className="w-12 text-center">
+                      {getRankIcon(creator.rank)}
+                    </div>
                     <Avatar className="h-12 w-12">
                       <AvatarImage src={creator.avatar || "/placeholder.svg"} />
-                      <AvatarFallback>{creator.name.slice(0, 2)}</AvatarFallback>
+                      <AvatarFallback>
+                        {creator.name.slice(0, 2)}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <h4 className="font-semibold">{creator.name}</h4>
-                      <p className="text-sm text-muted-foreground">{creator.username}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {creator.username}
+                      </p>
                     </div>
-                    <Badge className={`${getBadgeColor(creator.badge)} hidden sm:inline-flex`}>{creator.badge}</Badge>
+                    <Badge
+                      className={`${getBadgeColor(
+                        creator.badge
+                      )} hidden sm:inline-flex`}
+                    >
+                      {creator.badge}
+                    </Badge>
                     <div className="text-right">
-                      <div className="font-bold">{creator.points.toLocaleString()}</div>
-                      <div className="text-xs text-muted-foreground">{creator.remixes} remixes</div>
+                      <div className="font-bold">
+                        {formatNumberWithCommas(creator.points)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {creator.remixes} remixes
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -618,5 +764,5 @@ export default function LeaderboardPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

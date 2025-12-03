@@ -1,25 +1,40 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { RemixModal } from "@/components/remix-modal"
-import { UploadAdModal } from "@/components/upload-ad-modal"
-import { Heart, MessageCircle, Sparkles, Bookmark, MoreHorizontal, Upload, Trash2, ChevronDown } from "lucide-react"
-import { saveAd, getOrCreateCompany, getAllAds, deleteAd } from "@/lib/supabase"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { RemixModal } from "@/components/remix-modal";
+import { UploadAdModal } from "@/components/upload-ad-modal";
+import {
+  Heart,
+  MessageCircle,
+  Sparkles,
+  Bookmark,
+  MoreHorizontal,
+  Upload,
+  Trash2,
+  ChevronDown,
+} from "lucide-react";
+import {
+  saveAd,
+  getOrCreateCompany,
+  getAllAds,
+  deleteAd,
+} from "@/lib/supabase";
+import { formatNumberWithCommas } from "@/lib/format";
 
-const categories = ["All", "Super Bowl", "Tech", "Viral", "Fashion", "Food"]
+const categories = ["All", "Super Bowl", "Tech", "Viral", "Fashion", "Food"];
 
 const mockAds = [
-
   {
     id: 2,
     brand: "Apple",
     location: "Cupertino, California",
     image: "/apple-iphone-product-advertisement.jpg",
-    caption: "Innovation that moves the world forward. Beautifully designed, simply powerful.",
+    caption:
+      "Innovation that moves the world forward. Beautifully designed, simply powerful.",
     remixCount: 2891,
     likes: 5234,
     isLiked: false,
@@ -35,7 +50,8 @@ const mockAds = [
     brand: "Tesla",
     location: "Austin, Texas",
     image: "/tesla-electric-car-advertisement.jpg",
-    caption: "The future is electric. Sustainable energy for everyone. #Tesla #ElectricVehicle",
+    caption:
+      "The future is electric. Sustainable energy for everyone. #Tesla #ElectricVehicle",
     remixCount: 1823,
     likes: 4123,
     isLiked: false,
@@ -51,7 +67,8 @@ const mockAds = [
     brand: "Spotify",
     location: "Stockholm, Sweden",
     image: "/spotify-music-streaming-advertisement.jpg",
-    caption: "Music for everyone. Discover, stream, and share the soundtrack to your life.",
+    caption:
+      "Music for everyone. Discover, stream, and share the soundtrack to your life.",
     remixCount: 2134,
     likes: 4567,
     isLiked: false,
@@ -62,110 +79,152 @@ const mockAds = [
       { user: "dj_alex", text: "Perfect vibe", likes: 41 },
     ],
   },
-]
+];
 
 export default function HomePage() {
-  const router = useRouter()
-  const [isRemixModalOpen, setIsRemixModalOpen] = useState(false)
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
-  const [selectedAd, setSelectedAd] = useState<(typeof mockAds)[0] | null>(null)
-  const [ads, setAds] = useState(mockAds)
-  const [deletingAdId, setDeletingAdId] = useState<string | number | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
+  const router = useRouter();
+  const [isRemixModalOpen, setIsRemixModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [selectedAd, setSelectedAd] = useState<(typeof mockAds)[0] | null>(
+    null
+  );
+  const [ads, setAds] = useState(mockAds);
+  const [deletingAdId, setDeletingAdId] = useState<string | number | null>(
+    null
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [hasAccess, setHasAccess] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+
+  // Check if user has visited login page
+  useEffect(() => {
+    const checkAuth = () => {
+      if (typeof window !== "undefined") {
+        const visited = localStorage.getItem("hasVisitedLogin");
+        if (!visited) {
+          router.replace("/login");
+        } else {
+          setHasAccess(true);
+        }
+        setIsChecking(false);
+      }
+    };
+    checkAuth();
+  }, []);
 
   const filteredAds = searchQuery
-    ? ads.filter(ad =>
-        ad.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        ad.caption.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        ad.category.toLowerCase().includes(searchQuery.toLowerCase())
+    ? ads.filter(
+        (ad) =>
+          ad.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          ad.caption.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          ad.category.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : ads
+    : ads;
 
   // Load ads from Supabase on page load
   useEffect(() => {
     const loadAds = async () => {
       try {
-        console.log('🔄 Starting to load ads from Supabase...')
-        const supabaseAds = await getAllAds()
-        console.log('✅ Loaded ads from Supabase:', supabaseAds.length, 'ads')
-        console.log('📦 Raw Supabase data:', supabaseAds)
+        console.log("🔄 Starting to load ads from Supabase...");
+        const supabaseAds = await getAllAds();
+        console.log("✅ Loaded ads from Supabase:", supabaseAds.length, "ads");
+        console.log("📦 Raw Supabase data:", supabaseAds);
 
         // Transform Supabase ads to match the format expected by the component
         const transformedAds = supabaseAds.map((ad: any) => {
-          const imageUrl = ad.image_url || ad.video_url
-          const isVideo = !ad.image_url && ad.video_url
-          console.log('🔄 Transforming ad:', {
+          const imageUrl = ad.image_url || ad.video_url;
+          const isVideo = !ad.image_url && ad.video_url;
+          console.log("🔄 Transforming ad:", {
             id: ad.id,
             title: ad.title,
             imageUrl,
             videoUrl: ad.video_url,
             isVideo,
-            brand: ad.companies?.name
-          })
+            brand: ad.companies?.name,
+          });
 
           // Get the prompts count by counting the array length
-          const promptsCount = ad.prompts?.length || 0
+          const promptsCount = ad.prompts?.length || 0;
 
           return {
             id: ad.id,
-            brand: ad.companies?.name || 'Unknown',
-            location: ad.location || ad.companies?.location || 'Unknown',
+            brand: ad.companies?.name || "Unknown",
+            location: ad.location || ad.companies?.location || "Unknown",
             image: imageUrl,
-            caption: ad.title || '',
+            caption: ad.title || "",
             remixCount: promptsCount,
             likes: ad.likes || 0,
             isLiked: false,
             comments: promptsCount,
-            category: 'Tech', // You can add this to your schema later
+            category: "Tech", // You can add this to your schema later
             topComments: [],
-            isUserCreated: true
-          }
-        })
+            isUserCreated: true,
+          };
+        });
 
         // Combine with mock ads (user uploaded first, then mock ads)
-        setAds([...transformedAds, ...mockAds])
-        console.log('✅ Total ads in feed:', transformedAds.length, 'from Supabase +', mockAds.length, 'mock =', transformedAds.length + mockAds.length)
+        setAds([...transformedAds, ...mockAds]);
+        console.log(
+          "✅ Total ads in feed:",
+          transformedAds.length,
+          "from Supabase +",
+          mockAds.length,
+          "mock =",
+          transformedAds.length + mockAds.length
+        );
       } catch (error) {
-        console.error('❌ Error loading from Supabase:', error)
-        console.warn('⚠️ Supabase unavailable, using mock data only')
+        console.error("❌ Error loading from Supabase:", error);
+        console.warn("⚠️ Supabase unavailable, using mock data only");
         // Keep using mock ads on error - this is expected if database isn't set up
-        setAds(mockAds)
+        setAds(mockAds);
       }
-    }
+    };
 
-    loadAds()
-  }, [])
+    loadAds();
+  }, []);
 
-  const handleUpload = async (adData: { brand: string; title: string; imageUrl: string; category: string; companyId: string; location: string; isVideo?: boolean }) => {
+  const handleUpload = async (adData: {
+    brand: string;
+    title: string;
+    imageUrl: string;
+    category: string;
+    companyId: string;
+    location: string;
+    isVideo?: boolean;
+  }) => {
     try {
-      console.log('Upload started with data:', adData)
+      console.log("Upload started with data:", adData);
 
       // First, get or create the company
-      console.log('Getting or creating company:', adData.brand)
-      const company = await getOrCreateCompany(adData.brand)
-      console.log('Company retrieved:', company)
+      console.log("Getting or creating company:", adData.brand);
+      const company = await getOrCreateCompany(adData.brand);
+      console.log("Company retrieved:", company);
 
       // Then save the ad with the URL from upload and get the returned data
-      console.log('Saving ad to database...')
+      console.log("Saving ad to database...");
 
       // Check if it's a video from the upload response or file extension
-      const isVideoFile = adData.isVideo || adData.imageUrl?.match(/\.(mp4|webm|mov)$/i)
+      const isVideoFile =
+        adData.isVideo || adData.imageUrl?.match(/\.(mp4|webm|mov)$/i);
 
-      console.log('File type check:', { isVideo: isVideoFile, url: adData.imageUrl })
+      console.log("File type check:", {
+        isVideo: isVideoFile,
+        url: adData.imageUrl,
+      });
 
       const savedAd = await saveAd(
         company.id,
         adData.title,
-        isVideoFile ? '' : adData.imageUrl, // Image URL (empty string if video)
+        isVideoFile ? "" : adData.imageUrl, // Image URL (empty string if video)
         adData.location, // Location from form
         isVideoFile ? adData.imageUrl : undefined // Video URL if it's a video
-      )
+      );
 
-      console.log('Ad saved to Supabase successfully', savedAd)
+      console.log("Ad saved to Supabase successfully", savedAd);
 
       // Use the ID and likes returned from Supabase
-      const adId = savedAd[0].id
-      const adLikes = savedAd[0].likes || 0
+      const adId = savedAd[0].id;
+      const adLikes = savedAd[0].likes || 0;
 
       // Create new ad for the feed with Supabase ID
       const newAd = {
@@ -180,11 +239,11 @@ export default function HomePage() {
         comments: 0,
         category: adData.category,
         topComments: [],
-        isUserCreated: true
-      }
-      console.log('Adding ad to state:', newAd)
-      setAds([newAd, ...ads])
-      console.log('Ad added to state successfully')
+        isUserCreated: true,
+      };
+      console.log("Adding ad to state:", newAd);
+      setAds([newAd, ...ads]);
+      console.log("Ad added to state successfully");
 
       // Create new ad page data
       const newAdPageData = {
@@ -196,119 +255,127 @@ export default function HomePage() {
         currentEdit: "",
         likes: adLikes,
         tags: [adData.category.toLowerCase()],
-        isUserCreated: true
-      }
+        isUserCreated: true,
+      };
 
       // Store ad data in localStorage for later use when viewing details
-      const storedAds = JSON.parse(localStorage.getItem('adPagesData') || '{}')
-      storedAds[adId] = newAdPageData
-      localStorage.setItem('adPagesData', JSON.stringify(storedAds))
+      const storedAds = JSON.parse(localStorage.getItem("adPagesData") || "{}");
+      storedAds[adId] = newAdPageData;
+      localStorage.setItem("adPagesData", JSON.stringify(storedAds));
 
-      console.log('Upload completed successfully!')
-      alert('Ad uploaded successfully!')
+      console.log("Upload completed successfully!");
+      alert("Ad uploaded successfully!");
     } catch (error) {
-      console.error('Failed to save ad to Supabase:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      alert(`Failed to upload ad: ${errorMessage}`)
-      return // Don't close modal on error
+      console.error("Failed to save ad to Supabase:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      alert(`Failed to upload ad: ${errorMessage}`);
+      return; // Don't close modal on error
     }
 
     // Close the upload modal
-    setIsUploadModalOpen(false)
-  }
+    setIsUploadModalOpen(false);
+  };
 
   const handleDelete = async (id: number | string) => {
-    console.log('handleDelete called with id:', id, 'type:', typeof id)
-    setDeletingAdId(id)
+    console.log("handleDelete called with id:", id, "type:", typeof id);
+    setDeletingAdId(id);
 
     try {
       // If it's a Supabase ID (string), delete from database
-      if (typeof id === 'string') {
-        console.log('Deleting from Supabase...')
-        await deleteAd(id)
-        console.log('Successfully deleted from Supabase')
+      if (typeof id === "string") {
+        console.log("Deleting from Supabase...");
+        await deleteAd(id);
+        console.log("Successfully deleted from Supabase");
       }
 
       // Remove from local state
-      console.log('Removing from local state, current ads count:', ads.length)
-      setAds(prevAds => {
-        const newAds = prevAds.filter(ad => ad.id !== id)
-        console.log('New ads count:', newAds.length)
-        return newAds
-      })
+      console.log("Removing from local state, current ads count:", ads.length);
+      setAds((prevAds) => {
+        const newAds = prevAds.filter((ad) => ad.id !== id);
+        console.log("New ads count:", newAds.length);
+        return newAds;
+      });
 
       // Remove from localStorage
-      const storedAds = JSON.parse(localStorage.getItem('adPagesData') || '{}')
-      console.log('Stored ads before delete:', Object.keys(storedAds))
-      delete storedAds[id]
-      localStorage.setItem('adPagesData', JSON.stringify(storedAds))
-      console.log('Stored ads after delete:', Object.keys(storedAds))
+      const storedAds = JSON.parse(localStorage.getItem("adPagesData") || "{}");
+      console.log("Stored ads before delete:", Object.keys(storedAds));
+      delete storedAds[id];
+      localStorage.setItem("adPagesData", JSON.stringify(storedAds));
+      console.log("Stored ads after delete:", Object.keys(storedAds));
 
-      console.log('Ad deleted successfully')
+      console.log("Ad deleted successfully");
     } catch (error: any) {
-      console.error('Failed to delete ad:', error)
-      alert(`Failed to delete ad: ${error?.message || 'Unknown error'}`)
+      console.error("Failed to delete ad:", error);
+      alert(`Failed to delete ad: ${error?.message || "Unknown error"}`);
     } finally {
-      setDeletingAdId(null)
+      setDeletingAdId(null);
     }
-  }
+  };
 
   const handleRemix = (id: number | string) => {
-    const ad = ads.find((a) => a.id === id)
+    const ad = ads.find((a) => a.id === id);
     if (ad) {
-      setSelectedAd(ad)
-      setIsRemixModalOpen(true)
+      setSelectedAd(ad);
+      setIsRemixModalOpen(true);
     }
-  }
+  };
 
   const handleLike = (id: number) => {
-    setAds(ads.map(ad => {
-      if (ad.id === id) {
-        return {
-          ...ad,
-          isLiked: !ad.isLiked,
-          likes: ad.isLiked ? ad.likes - 1 : ad.likes + 1
+    setAds(
+      ads.map((ad) => {
+        if (ad.id === id) {
+          return {
+            ...ad,
+            isLiked: !ad.isLiked,
+            likes: ad.isLiked ? ad.likes - 1 : ad.likes + 1,
+          };
         }
-      }
-      return ad
-    }))
-  }
+        return ad;
+      })
+    );
+  };
 
   const scrollToFeed = () => {
-    const feedElement = document.getElementById('feed')
+    const feedElement = document.getElementById("feed");
     if (feedElement) {
-      feedElement.scrollIntoView({ behavior: 'smooth' })
+      feedElement.scrollIntoView({ behavior: "smooth" });
     }
-  }
+  };
 
   // Auto-scroll after 2.5 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
-      scrollToFeed()
-    }, 2500)
+      scrollToFeed();
+    }, 2500);
 
-    return () => clearTimeout(timer)
-  }, [])
+    return () => clearTimeout(timer);
+  }, []);
 
   // Listen for global search events
   useEffect(() => {
     const handleGlobalSearch = (e: any) => {
-      setSearchQuery(e.detail)
+      setSearchQuery(e.detail);
       // Scroll to feed when searching
-      scrollToFeed()
-    }
+      scrollToFeed();
+    };
 
-    window.addEventListener('globalSearch', handleGlobalSearch)
+    window.addEventListener("globalSearch", handleGlobalSearch);
 
     // Check for stored search query on mount
-    const storedQuery = sessionStorage.getItem('searchQuery')
+    const storedQuery = sessionStorage.getItem("searchQuery");
     if (storedQuery) {
-      setSearchQuery(storedQuery)
-      sessionStorage.removeItem('searchQuery')
+      setSearchQuery(storedQuery);
+      sessionStorage.removeItem("searchQuery");
     }
 
-    return () => window.removeEventListener('globalSearch', handleGlobalSearch)
-  }, [])
+    return () => window.removeEventListener("globalSearch", handleGlobalSearch);
+  }, []);
+
+  // Show nothing while checking authentication
+  if (isChecking || !hasAccess) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -352,7 +419,10 @@ export default function HomePage() {
 
         {/* Content */}
         <div className="text-center relative z-10">
-          <h1 className="text-5xl md:text-8xl font-semibold mb-4 gradient-text" style={{ fontFamily: 'Gill Sans, sans-serif' }}>
+          <h1
+            className="text-5xl md:text-8xl font-semibold mb-4 gradient-text"
+            style={{ fontFamily: "Gill Sans, sans-serif" }}
+          >
             Welcome to Konten.in
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8">
@@ -362,7 +432,9 @@ export default function HomePage() {
             onClick={scrollToFeed}
             className="group flex flex-col items-center gap-2 mx-auto transition-transform hover:scale-110"
           >
-            <span className="text-sm text-muted-foreground">Scroll to explore</span>
+            <span className="text-sm text-muted-foreground">
+              Scroll to explore
+            </span>
             <ChevronDown className="h-8 w-8 text-primary animate-bounce" />
           </button>
         </div>
@@ -385,7 +457,8 @@ export default function HomePage() {
         {searchQuery && (
           <div className="max-w-6xl mx-auto mb-4">
             <p className="text-muted-foreground">
-              {filteredAds.length} result{filteredAds.length !== 1 ? 's' : ''} for "{searchQuery}"
+              {filteredAds.length} result{filteredAds.length !== 1 ? "s" : ""}{" "}
+              for "{searchQuery}"
             </p>
           </div>
         )}
@@ -405,7 +478,9 @@ export default function HomePage() {
                   </Avatar>
                   <div>
                     <div className="font-semibold text-sm">{ad.brand}</div>
-                    <div className="text-xs text-muted-foreground">{ad.location}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {ad.location}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -416,9 +491,11 @@ export default function HomePage() {
                       className="h-8 w-8 hover:text-destructive"
                       disabled={deletingAdId === ad.id}
                       onClick={(e) => {
-                        e.stopPropagation()
-                        if (confirm('Are you sure you want to delete this ad?')) {
-                          handleDelete(ad.id)
+                        e.stopPropagation();
+                        if (
+                          confirm("Are you sure you want to delete this ad?")
+                        ) {
+                          handleDelete(ad.id);
                         }
                       }}
                       title="Delete ad"
@@ -441,7 +518,9 @@ export default function HomePage() {
                 className="relative aspect-square w-full overflow-hidden cursor-pointer"
                 onClick={() => router.push(`/ad/${ad.id}`)}
               >
-                {ad.image?.endsWith('.mp4') || ad.image?.endsWith('.webm') || ad.image?.endsWith('.mov') ? (
+                {ad.image?.endsWith(".mp4") ||
+                ad.image?.endsWith(".webm") ||
+                ad.image?.endsWith(".mov") ? (
                   <video
                     src={ad.image}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
@@ -469,7 +548,9 @@ export default function HomePage() {
                     >
                       <Heart
                         className={`h-6 w-6 ${
-                          ad.isLiked ? "fill-red-500 text-red-500" : "text-foreground"
+                          ad.isLiked
+                            ? "fill-red-500 text-red-500"
+                            : "text-foreground"
                         }`}
                       />
                     </button>
@@ -487,7 +568,7 @@ export default function HomePage() {
 
                 {/* Likes Count */}
                 <div className="font-semibold text-sm mb-2">
-                  {ad.likes.toLocaleString()} likes
+                  {formatNumberWithCommas(ad.likes)} likes
                 </div>
 
                 {/* Caption */}
@@ -507,21 +588,24 @@ export default function HomePage() {
                 )}
 
                 {/* Top Comments Preview */}
-                {(ad as any).topComments && (ad as any).topComments.length > 0 && (
-                  <div className="space-y-1 mb-2">
-                    {ad.topComments.slice(0, 2).map((comment, idx) => (
-                      <div key={idx} className="text-sm">
-                        <span className="font-semibold mr-2">{comment.user}</span>
-                        <span>{comment.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {(ad as any).topComments &&
+                  (ad as any).topComments.length > 0 && (
+                    <div className="space-y-1 mb-2">
+                      {ad.topComments.slice(0, 2).map((comment, idx) => (
+                        <div key={idx} className="text-sm">
+                          <span className="font-semibold mr-2">
+                            {comment.user}
+                          </span>
+                          <span>{comment.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                 {/* Remix Count */}
                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-2">
                   <Sparkles className="h-3 w-3" />
-                  <span>{ad.remixCount.toLocaleString()} remixes</span>
+                  <span>{formatNumberWithCommas(ad.remixCount)} remixes</span>
                 </div>
               </div>
             </Card>
@@ -530,7 +614,11 @@ export default function HomePage() {
       </section>
 
       {/* Remix Modal */}
-      <RemixModal isOpen={isRemixModalOpen} onClose={() => setIsRemixModalOpen(false)} ad={selectedAd} />
+      <RemixModal
+        isOpen={isRemixModalOpen}
+        onClose={() => setIsRemixModalOpen(false)}
+        ad={selectedAd}
+      />
 
       {/* Upload Modal */}
       <UploadAdModal
@@ -539,5 +627,5 @@ export default function HomePage() {
         onSubmit={handleUpload}
       />
     </div>
-  )
+  );
 }
